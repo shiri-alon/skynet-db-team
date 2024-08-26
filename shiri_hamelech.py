@@ -26,7 +26,6 @@ def create_connection():
     )
     return conn
 
-
 def execute_query(query="SELECT * FROM trial;"):
     # Create a connection and a cursor
     conn = create_connection()
@@ -39,11 +38,21 @@ def execute_query(query="SELECT * FROM trial;"):
         # Fetch all rows from the executed query
         rows = cursor.fetchall()
 
+        # Get column names from cursor description
+        column_names = [description[0] for description in cursor.description]
+
+        # Convert each row into a dictionary with column names as keys
+        results = []
+        for row in rows:
+            row_dict = dict(zip(column_names, row))
+            results.append(row_dict)
+
         # Commit and close the connection
         conn.commit()
         conn.close()
 
-        return rows
+        # Return the list of dictionaries (objects)
+        return results
     except Exception as e:
         # Ensure the connection is closed in case of an error
         conn.close()
