@@ -86,50 +86,50 @@ def getAll():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @app.route('/api/getColumns', methods=['GET'])
-# def getColumns():
-#     # Get table name and column names from query parameters
-#     table_name = request.args.get('table_name')
-#     columns = request.args.get('columns')
+@app.route('/api/getColumns', methods=['GET'])
+def getColumns():
+    # Get table name and column names from query parameters
+    table_name = request.args.get('table_name')
+    columns = request.args.get('columns')
 
-#     # Sanitize input
-#     if not table_name or not table_name.isidentifier() or not columns:
-#         return jsonify({"error": "Invalid table name or columns"}), 400
+    # Sanitize input
+    if not table_name or not table_name.isidentifier() or not columns:
+        return jsonify({"error": "Invalid table name or columns"}), 400
     
-#     # Prepare query
-#     columns_list = columns.split(',')
-#     columns_str = ', '.join([f'"{col.strip()}"' for col in columns_list])
-#     query = f"SELECT {columns_str} FROM {table_name}"
+    # Prepare query
+    columns_list = columns.split(',')
+    columns_str = ', '.join([f'"{col.strip()}"' for col in columns_list])
+    query = f"SELECT {columns_str} FROM {table_name}"
     
-#     # Fetch data
-#     try:
-#         data = create_connection(query)
-#         return jsonify({"data": data})
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+    # Fetch data
+    try:
+        data = execute_query(query)
+        return jsonify({"data": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-# #TODO:doing now
-# @app.route('/api/getLaunchById', methods=['GET'])
-# def getLaunchById():
-#     # Get ID from query parameters
-#     launch_id = request.args.get('id')
+#TODO:doing now
+@app.route('/api/getLaunchById', methods=['GET'])
+def getLaunchById():
+    # Get ID from query parameters
+    launch_id = request.args.get('id')
 
-#     # Validate and sanitize input
-#     if not launch_id or not launch_id.isdigit():
-#         return jsonify({"error": "Invalid ID"}), 400
+    # Validate and sanitize input
+    if not launch_id or not launch_id.isdigit():
+        return jsonify({"error": "Invalid ID"}), 400
     
-#     # Prepare query
-#     query = f"SELECT * FROM launch WHERE id = {launch_id}"
+    # Prepare query
+    query = f"SELECT * FROM launch WHERE id = {launch_id}"
     
-#     # Fetch data
-#     try:
-#         data = create_connection(query)
-#         if data:
-#             return jsonify({"data": data[0]})
-#         else:
-#             return jsonify({"error": "No data found for the given ID"}), 404
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+    # Fetch data
+    try:
+        data = execute_query(query)
+        if data:
+            return jsonify({"data": data[0]})
+        else:
+            return jsonify({"error": "No data found for the given ID"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # #TODO
@@ -177,16 +177,16 @@ def getAll():
 # #TODO
 # @app.route('/api/getLaunchByDate', methods=['GET'])
 # def getLaunchByDate():
-#     # Prepare query
-#     query = "SELECT Date, COUNT(*) FROM launch GROUP BY Date"
+# #     # Prepare query
+# #     query = "SELECT Date, COUNT(*) FROM launch GROUP BY Date"
     
-#     # Fetch data
-#     try:
-#         data = create_connection(query)
-#         date_counts = {row[0]: row[1] for row in data}
-#         return jsonify({"data": date_counts})
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+# #     # Fetch data
+# #     try:
+# #         data = create_connection(query)
+# #         date_counts = {row[0]: row[1] for row in data}
+# #         return jsonify({"data": date_counts})
+# #     except Exception as e:
+# #         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
