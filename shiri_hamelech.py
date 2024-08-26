@@ -156,37 +156,30 @@ def getCasualtyById():
         return jsonify({"error": str(e)}), 500
 
 # #TODO
-# @app.route('/api/wasIntercepted', methods=['GET'])
-# def wasIntercepted():
-#     # Prepare query
-#     query = "SELECT Intersept, COUNT(*) FROM launch GROUP BY Intersept"
+@app.route('/api/wasIntercepted', methods=['GET'])
+def wasIntercepted():
+    # Prepare query
+    query = "SELECT was_intercepted, COUNT(*) FROM launch GROUP BY was_intercepted"
     
-#     # Fetch data
-#     try:
-#         data = create_connection(query)
-#         counts = {0: 0, 1: 0}
-#         for row in data:
-#             intercept_value = row[0]
-#             count = row[1]
-#             if intercept_value in counts:
-#                 counts[intercept_value] = count
-#         return jsonify({"data": counts})
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+    # Fetch data
+    try:
+        data = execute_query(query)
+        return jsonify({"data": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # #TODO
-# @app.route('/api/getLaunchByDate', methods=['GET'])
-# def getLaunchByDate():
-# #     # Prepare query
-# #     query = "SELECT Date, COUNT(*) FROM launch GROUP BY Date"
+@app.route('/api/getLaunchByDate', methods=['GET'])
+def getLaunchByDate():
+    # Prepare query
+    query = "SELECT start_date, COUNT(*) FROM launch GROUP BY start_date"
     
-# #     # Fetch data
-# #     try:
-# #         data = create_connection(query)
-# #         date_counts = {row[0]: row[1] for row in data}
-# #         return jsonify({"data": date_counts})
-# #     except Exception as e:
-# #         return jsonify({"error": str(e)}), 500
+    # Fetch data
+    try:
+        data = execute_query(query)
+        return jsonify({"data": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
