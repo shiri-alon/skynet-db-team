@@ -108,7 +108,7 @@ def getColumns():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-#TODO:doing now
+
 @app.route('/api/getLaunchById', methods=['GET'])
 def getLaunchById():
     # Get ID from query parameters
@@ -132,28 +132,28 @@ def getLaunchById():
         return jsonify({"error": str(e)}), 500
 
 
-# #TODO
-# @app.route('/api/getCasualtyById', methods=['GET'])
-# def getCasualtyById():
-#     # Get ID from query parameters
-#     casualty_id = request.args.get('id')
+#TODO:doing now
+@app.route('/api/getCasualtyById', methods=['GET'])
+def getCasualtyById():
+    # Get ID from query parameters
+    casualty_id = request.args.get('id')
 
-#     # Validate and sanitize input
-#     if not casualty_id or not casualty_id.isdigit():
-#         return jsonify({"error": "Invalid ID"}), 400
+    # Validate and sanitize input
+    if not casualty_id or not casualty_id.isdigit():
+        return jsonify({"error": "Invalid ID"}), 400
     
-#     # Prepare query
-#     query = f"SELECT * FROM casualty WHERE id = {casualty_id}"
+    # Prepare query
+    query = f"SELECT * FROM casualty WHERE casualty_id = {casualty_id}"
     
-#     # Fetch data
-#     try:
-#         data = create_connection(query)
-#         if data:
-#             return jsonify({"data": data[0]})
-#         else:
-#             return jsonify({"error": "No data found for the given ID"}), 404
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+    # Fetch data
+    try:
+        data = execute_query(query)
+        if data:
+            return jsonify({"data": data[0]})
+        else:
+            return jsonify({"error": "No data found for the given ID"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # #TODO
 # @app.route('/api/wasIntercepted', methods=['GET'])
