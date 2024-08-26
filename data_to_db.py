@@ -4,13 +4,16 @@ import json
 import requests
 import flask
 import time
+import pytz
+import math
+from datetime import datetime
 
 DATABASE = 'defaultdb'
 USER = 'avnadmin'
 PASSWORD = 'AVNS_S8oDGGNacTWZPB-XVhR'
 HOST = 'pg-2026da66-zr101-a12c.h.aivencloud.com'  # e.g., 'localhost'
 PORT = '11302'  # e.g., '5432'
-URL = "https://skynetgroup5.onrender.com/launch/historical"
+URL = "https://skynetgroup5.onrender.com/launch/new"
 
 
 
@@ -28,6 +31,7 @@ def insert_to_db(json_data):
     # Parsing casualty object from main object
     json_data_casualty = json_data.pop('casualty')
     # Add casualty id to json
+    # json_data_casualty['casualty_id'] = 30
     json_data['casualty_id'] = json_data_casualty['casualty_id']
 
     # Pop start and end point from json and add them seperately
@@ -37,6 +41,15 @@ def insert_to_db(json_data):
     json_data['start_location_y'] = start_location['y']
     json_data['end_location_x'] = end_location['x']
     json_data['end_location_y'] = end_location['y']
+
+    json_data['start_date'] = datetime.fromtimestamp(json_data['start_date']//1000)
+    json_data['end_date'] = datetime.fromtimestamp(json_data['end_date']//1000)
+    
+    json_data['start_date'] = json_data['start_date'].strftime('%Y-%m-%d %H:%M:%S.') + f"{int(json_data['start_date'].microsecond / 1000):03d}"
+    json_data['end_date'] = json_data['end_date'].strftime('%Y-%m-%d %H:%M:%S.') + f"{int(json_data['end_date'].microsecond / 1000):03d}"
+
+
+    print(type(json_data['start_date']))
 
     # Parse between keys and values of each table
     keys_c = tuple(json_data_casualty.keys())
@@ -94,8 +107,8 @@ def handle_req_and_insert():
         json_obj = response.json()
         print(json_obj)
 
-        for entry in json_obj:
-            insert_to_db(entry) 
+        insert_to_db(json_obj)
+
     except requests.RequestException as e:
         print("An error occurred:", e)
 
@@ -103,7 +116,7 @@ def handle_req_and_insert():
 while True:
     try:
         handle_req_and_insert()
-        time.sleep(30)
+        time.sleep(10)
     except KeyboardInterrupt:
         print("Script interrupted by user.")
 
