@@ -119,7 +119,7 @@ def getLaunchById():
         return jsonify({"error": "Invalid ID"}), 400
     
     # Prepare query
-    query = f"SELECT * FROM launch WHERE id = {launch_id}"
+    query = f"SELECT * FROM launch WHERE casualty_id = {launch_id}"
     
     # Fetch data
     try:
