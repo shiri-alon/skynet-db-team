@@ -5,28 +5,33 @@ app = Flask(__name__)
 
 
 
-DATABASE = 'defaultdb'
-USER = 'avnadmin'
-PASSWORD = 'AVNS_S8oDGGNacTWZPB-XVhR'
-HOST = 'pg-2026da66-zr101-a12c.h.aivencloud.com'  # e.g., 'localhost'
-PORT = '11302'  # e.g., '5432'
 
 
-# Connect to your PostgreSQL database
-conn = psycopg2.connect(
-    dbname=DATABASE,
-    user=USER,
-    password=PASSWORD,
-    host=HOST,
-    port=PORT
-)
-
-
-def create_connection(query="SELECT * FROM trial;"):
+def create_connection():
     # Create a cursor object
+    DATABASE = 'defaultdb'
+    USER = 'avnadmin'
+    PASSWORD = 'AVNS_S8oDGGNacTWZPB-XVhR'
+    HOST = 'pg-2026da66-zr101-a12c.h.aivencloud.com'  # e.g., 'localhost'
+    PORT = '11302'  # e.g., '5432'
+
+
+    # Connect to your PostgreSQL database
+    conn = psycopg2.connect(
+        dbname=DATABASE,
+        user=USER,
+        password=PASSWORD,
+        host=HOST,
+        port=PORT
+    )
+    return conn
+
+
+def execute_query(query="SELECT * FROM trial;"):
+    # Create a connection and a cursor
+    conn = create_connection()
     cursor = conn.cursor()
 
-    # Define your query
     try:
         # Execute the query
         cursor.execute(query)
@@ -34,16 +39,15 @@ def create_connection(query="SELECT * FROM trial;"):
         # Fetch all rows from the executed query
         rows = cursor.fetchall()
 
-        # Print fetched rows
-        for row in rows:
-            print(row)
-       
-        return rows        
+        # Commit and close the connection
+        conn.commit()
+        conn.close()
+
+        return rows
     except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-
+        # Ensure the connection is closed in case of an error
+        conn.close()
+        raise e
 
 
 
@@ -53,48 +57,127 @@ def create_connection(query="SELECT * FROM trial;"):
 def home():
     return "Welcome to the Flask server!"
 
-
+# Route for the getAll API
 @app.route('/api/getAll', methods=['GET'])
 def getAll():
     # Get table name from query parameters
     table_name = request.args.get('table_name')
+
     # Sanitize table name to prevent SQL injection
     if not table_name or not table_name.isidentifier():
         return jsonify({"error": "Invalid table name"}), 400
     
     # Construct query
     query = f"SELECT * FROM {table_name}"
-    
+
     # Fetch data
     try:
-        data = create_connection(query)
-        print(data)
+        data = execute_query(query)
         return jsonify({"data": data})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# @app.route('/api/getColumns', methods=['GET'])
+# def getColumns():
+#     # Get table name and column names from query parameters
+#     table_name = request.args.get('table_name')
+#     columns = request.args.get('columns')
 
-@app.route('/api/getColumns', methods=['GET'])
-def getColumns():
-    # Get table name and column names from query parameters
-    table_name = request.args.get('table_name')
-    columns = request.args.get('columns')
+#     # Sanitize input
+#     if not table_name or not table_name.isidentifier() or not columns:
+#         return jsonify({"error": "Invalid table name or columns"}), 400
+    
+#     # Prepare query
+#     columns_list = columns.split(',')
+#     columns_str = ', '.join([f'"{col.strip()}"' for col in columns_list])
+#     query = f"SELECT {columns_str} FROM {table_name}"
+    
+#     # Fetch data
+#     try:
+#         data = create_connection(query)
+#         return jsonify({"data": data})
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-    # Sanitize input
-    if not table_name or not table_name.isidentifier() or not columns:
-        return jsonify({"error": "Invalid table name or columns"}), 400
+# #TODO:doing now
+# @app.route('/api/getLaunchById', methods=['GET'])
+# def getLaunchById():
+#     # Get ID from query parameters
+#     launch_id = request.args.get('id')
+
+#     # Validate and sanitize input
+#     if not launch_id or not launch_id.isdigit():
+#         return jsonify({"error": "Invalid ID"}), 400
     
-    # Prepare query
-    columns_list = columns.split(',')
-    columns_str = ', '.join([f'"{col.strip()}"' for col in columns_list])
-    query = f"SELECT {columns_str} FROM {table_name}"
+#     # Prepare query
+#     query = f"SELECT * FROM launch WHERE id = {launch_id}"
     
-    # Fetch data
-    try:
-        data = create_connection(query)
-        return jsonify({"data": data})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     # Fetch data
+#     try:
+#         data = create_connection(query)
+#         if data:
+#             return jsonify({"data": data[0]})
+#         else:
+#             return jsonify({"error": "No data found for the given ID"}), 404
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
+# #TODO
+# @app.route('/api/getCasualtyById', methods=['GET'])
+# def getCasualtyById():
+#     # Get ID from query parameters
+#     casualty_id = request.args.get('id')
+
+#     # Validate and sanitize input
+#     if not casualty_id or not casualty_id.isdigit():
+#         return jsonify({"error": "Invalid ID"}), 400
+    
+#     # Prepare query
+#     query = f"SELECT * FROM casualty WHERE id = {casualty_id}"
+    
+#     # Fetch data
+#     try:
+#         data = create_connection(query)
+#         if data:
+#             return jsonify({"data": data[0]})
+#         else:
+#             return jsonify({"error": "No data found for the given ID"}), 404
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+# #TODO
+# @app.route('/api/wasIntercepted', methods=['GET'])
+# def wasIntercepted():
+#     # Prepare query
+#     query = "SELECT Intersept, COUNT(*) FROM launch GROUP BY Intersept"
+    
+#     # Fetch data
+#     try:
+#         data = create_connection(query)
+#         counts = {0: 0, 1: 0}
+#         for row in data:
+#             intercept_value = row[0]
+#             count = row[1]
+#             if intercept_value in counts:
+#                 counts[intercept_value] = count
+#         return jsonify({"data": counts})
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+# #TODO
+# @app.route('/api/getLaunchByDate', methods=['GET'])
+# def getLaunchByDate():
+#     # Prepare query
+#     query = "SELECT Date, COUNT(*) FROM launch GROUP BY Date"
+    
+#     # Fetch data
+#     try:
+#         data = create_connection(query)
+#         date_counts = {row[0]: row[1] for row in data}
+#         return jsonify({"data": date_counts})
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
